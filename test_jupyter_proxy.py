@@ -220,45 +220,49 @@ def start_test_server(port=9999, background=True):
     Handler = ProxyTestHandler
     
     try:
-        with socketserver.TCPServer(("", port), Handler) as httpd:
-            print(f"\n{'='*60}")
-            print(f"  Jupyter Server Proxy Test Server")
-            print(f"{'='*60}")
-            print(f"  Server running on port {port}")
-            print(f"  Access via proxy: /proxy/{port}/")
-            
-            # Check if we're in JupyterHub/Binder environment
-            prefix = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "")
-            if prefix:
-                if not prefix.endswith("/"):
-                    prefix += "/"
-                print(f"  Full URL: {prefix}proxy/{port}/")
-            
-            print(f"{'='*60}\n")
-            
-            if background:
-                def serve():
-                    try:
-                        httpd.serve_forever()
-                    except KeyboardInterrupt:
-                        print("\nShutting down test server...")
-                
-                thread = threading.Thread(target=serve, daemon=True)
-                thread.start()
-                return thread
-            else:
-                try:
-                    httpd.serve_forever()
-                except KeyboardInterrupt:
-                    print("\nShutting down test server...")
-                    return None
-    
+        httpd = socketserver.TCPServer(("", port), Handler)
     except OSError as e:
         if e.errno == 48:  # Address already in use
             print(f"\n❌ Error: Port {port} is already in use.")
             print(f"   Try a different port or stop the existing server.\n")
-        else:
-            raise
+            return None
+        raise
+
+    print(f"\n{'='*60}")
+    print(f"  Jupyter Server Proxy Test Server")
+    print(f"{'='*60}")
+    print(f"  Server running on port {port}")
+    print(f"  Access via proxy: /proxy/{port}/")
+
+    # Check if we're in JupyterHub/Binder environment
+    prefix = os.environ.get("JUPYTERHUB_SERVICE_PREFIX", "")
+    if prefix:
+        if not prefix.endswith("/"):
+            prefix += "/"
+        print(f"  Full URL: {prefix}proxy/{port}/")
+
+    print(f"{'='*60}\n")
+
+    if background:
+        def serve():
+            try:
+                httpd.serve_forever()
+            except KeyboardInterrupt:
+                print("\nShutting down test server...")
+            finally:
+                httpd.server_close()
+
+        thread = threading.Thread(target=serve, daemon=True)
+        thread.start()
+        return thread
+
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nShutting down test server...")
+    finally:
+        httpd.server_close()
+    return None
 
 
 def create_jupyter_server_config():
