@@ -112,9 +112,9 @@ class ProxyTestHandler(http.server.SimpleHTTPRequestHandler):
         <div class="info">
             <h3>Connection Details:</h3>
             <p><strong>Request Path:</strong> <code>{self.path}</code></p>
-            <p><strong>Server Port:</strong> <code>{self.server.server_port}</code></p>
+            <p><strong>Server Port:</strong> <code>{self.server.server_address[1]}</code></p>
             <p><strong>Proxy Prefix:</strong> <code>{proxy_prefix or "Not set (direct access)"}</code></p>
-            <p><strong>Access URL:</strong> <code>{proxy_prefix}proxy/{self.server.server_port}/</code></p>
+            <p><strong>Access URL:</strong> <code>{proxy_prefix}proxy/{self.server.server_address[1]}/</code></p>
         </div>
         
         <div class="info">
@@ -191,7 +191,7 @@ class ProxyTestHandler(http.server.SimpleHTTPRequestHandler):
             response = {
                 "status": "ok",
                 "message": "API endpoint working through proxy",
-                "port": self.server.server_port,
+                "port": self.server.server_address[1],
                 "path": self.path
             }
             self.wfile.write(str(response).encode())
