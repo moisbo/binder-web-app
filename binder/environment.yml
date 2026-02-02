@@ -1,0 +1,8 @@
+name: binder-web-app
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - jupyter-server-proxy==4.1.2
