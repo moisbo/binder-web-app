@@ -103,10 +103,10 @@ class ProxyTestHandler(http.server.SimpleHTTPRequestHandler):
 </head>
 <body>
     <div class="container">
-        <h1>🎉 Jupyter Server Proxy Test Page</h1>
+        <h1>Jupyter Server Proxy Test Page</h1>
         
         <div class="info success">
-            <strong>✅ Success!</strong> The proxy is working correctly.
+            <strong>Success!</strong> The proxy is working correctly.
         </div>
         
         <div class="info">
